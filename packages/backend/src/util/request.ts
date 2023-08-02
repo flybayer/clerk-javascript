@@ -17,8 +17,18 @@ export function checkCrossOrigin({
   forwardedHost?: string | null;
   forwardedProto?: string | null;
 }) {
-  const finalURL = buildOrigin({ forwardedProto, forwardedHost, protocol: originURL.protocol, host });
-  return finalURL && new URL(finalURL).origin !== originURL.origin;
+  const finalURLstring = buildOrigin({ forwardedProto, forwardedHost, protocol: originURL.protocol, host });
+  if (!finalURLstring) {
+    return false;
+  }
+  const finalURL = new URL(finalURLstring);
+  if (finalURL.origin === originURL.origin) {
+    return false;
+  }
+  if (finalURL.host === originURL.host && finalURL.protocol === 'https:' && originURL.protocol === 'http:') {
+    return false;
+  }
+  return true;
 }
 
 export function convertHostHeaderValueToURL(host?: string, protocol = 'https'): URL {
